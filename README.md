@@ -14,5 +14,5 @@ It would show you the obejct type porperty with assign attribute:
 KTPropertyCheck: bar in class: Foo
 ```
 
-# Usaged
+# License
 Maybe MIT. But I'm too lazy to care about it. 🚑
