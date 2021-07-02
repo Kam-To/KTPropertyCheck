@@ -54,6 +54,7 @@ static bool isPropertyPass(objc_property_t pro) {
 }
 
 + (void)_check:(Class)cls {
+    
     const char *targetImageName = class_getImageName(cls);
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t idx = 0; idx < imageCount; idx++) {
@@ -61,9 +62,9 @@ static bool isPropertyPass(objc_property_t pro) {
         
         // find target image
         if (strcmp(binaryName, targetImageName) == 0) {
-            
-            const struct mach_header *header = _dyld_get_image_header(idx);
+
             unsigned long size = 0;
+            const struct mach_header *header = _dyld_get_image_header(idx);
             const char *objcClassListSectionName = "__objc_classlist";
             
             void *data = getsectiondata((void *)header, "__DATA", objcClassListSectionName, &size);
@@ -73,7 +74,10 @@ static bool isPropertyPass(objc_property_t pro) {
             Class *classList = (Class *)data;
             unsigned long classCount = (unsigned int)(size / sizeof(Class));
             for (unsigned long clzIdx = 0; clzIdx < classCount; clzIdx++) {
-                Class z =  [classList[clzIdx] class];
+                Class z = classList[clzIdx];
+                z = NSClassFromString(NSStringFromClass(z)); // for reading class not would not loaded in runtime
+                if (!z) continue;
+                
                 unsigned int outCount = 0;
                 objc_property_t *list = class_copyPropertyList(z, &outCount);
                 // no property, skip it...
