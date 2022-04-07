@@ -15,4 +15,6 @@ KTPropertyCheck: bar in class: Foo
 ```
 
 # License
-Maybe MIT. But I'm too lazy to care about it. 🚑
+
+All source code is licensed under the MIT License.
+

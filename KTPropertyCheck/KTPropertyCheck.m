@@ -18,32 +18,46 @@ static bool isPropertyPass(objc_property_t pro) {
     if (!pro) return false;
     
     const char *attr = property_getAttributes(pro);
-    
+    /// non-object type, return
     if (attr[0] != 'T' || attr[1] != '@') return true;
     
     char *ptr = (char *)attr;
-    bool metComma = false;
+    bool metComma = false; /// start
+    bool metGorV = false; /// end
     bool pass = false;
     
-    // traverse attributes
+    /// traverse attributes
     while (*ptr != '\0') {
         char c = *ptr;
         if (c == 'R') {
             pass = true;
-            break; // pass over readonly property
+            break; /// pass over readonly property
         }
 
         if (metComma) {
-            // strong, copy , weak
+            /// strong, copy , weak
             if (c == '&' || c == 'C' || c == 'W') pass = true;
-            // otherwise it's assign
+        }
+        
+        if (!metComma) {
+            metComma = (c == ',');
+        }
+        
+        if (metComma) {
+            /// G - custom getter prefix, V - variable name prefix
+            metGorV = (c == 'G') || (c == 'V');
+        }
+        
+        if (metGorV) {
             break;
         }
-        metComma = (c == ',');
+        
         ptr++;
     }
     
-    if (!pass) fprintf(stdout, "KTPropertyCheck: %s", property_getName(pro));
+    if (!pass) {
+        fprintf(stdout, "KTPropertyCheck: ⚠️ %s", property_getName(pro));
+    }
     return pass;
 }
 
